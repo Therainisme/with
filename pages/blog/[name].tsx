@@ -1,12 +1,10 @@
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import * as fs from 'fs';
-import { getBlogContent, getBlogs } from '../../util';
+import { AsyncFuncReturnType, getBlogContent, getBlogs } from '../../util';
 
-type UnPromisify<T> = T extends Promise<infer U> ? U : T;
-type Props = UnPromisify<ReturnType<typeof getStaticProps>>['props']
-type Params = UnPromisify<ReturnType<typeof getStaticPaths>>['paths'][0]
+type Props = AsyncFuncReturnType<typeof getStaticProps>['props']
+type Params = AsyncFuncReturnType<typeof getStaticPaths>['paths'][0]
 
 export async function getStaticPaths() {
   const blogs = await getBlogs();

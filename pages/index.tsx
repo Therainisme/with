@@ -2,12 +2,9 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import * as fs from 'fs';
-import { getBlogs } from '../util';
+import { AsyncFuncReturnType, getBlogs } from '../util';
 
-// T extends U ? X : Y
-// 如果 T 能赋值给 U，返回 X，否则返回 Y
-type UnPromisify<T> = T extends Promise<infer U> ? U : T;
-type Props = UnPromisify<ReturnType<typeof getStaticProps>>['props']
+type Props = AsyncFuncReturnType<typeof getStaticProps>['props']
 
 export async function getStaticProps() {
   const blogs = await getBlogs();
