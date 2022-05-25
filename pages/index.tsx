@@ -4,7 +4,7 @@ import Link from 'next/link';
 import * as fs from 'fs';
 import { AsyncFuncReturnType, getBlogs } from '../util';
 
-type Props = AsyncFuncReturnType<typeof getStaticProps>['props']
+type Props = AsyncFuncReturnType<typeof getStaticProps>['props'];
 
 export async function getStaticProps() {
   const blogs = await getBlogs();
@@ -13,7 +13,7 @@ export async function getStaticProps() {
     props: {
       blogs
     }
-  }
+  };
 }
 
 export default function Home(props: Props) {
@@ -37,5 +37,5 @@ export default function Home(props: Props) {
       }
 
     </div>
-  )
+  );
 }

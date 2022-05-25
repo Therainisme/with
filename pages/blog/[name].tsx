@@ -2,9 +2,10 @@ import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { AsyncFuncReturnType, getBlogContent, getBlogs } from '../../util';
+import { compileMarkdown } from '../../util/md';
 
-type Props = AsyncFuncReturnType<typeof getStaticProps>['props']
-type Params = AsyncFuncReturnType<typeof getStaticPaths>['paths'][0]
+type Props = AsyncFuncReturnType<typeof getStaticProps>['props'];
+type Params = AsyncFuncReturnType<typeof getStaticPaths>['paths'][0];
 
 export async function getStaticPaths() {
   const blogs = await getBlogs();
@@ -12,22 +13,25 @@ export async function getStaticPaths() {
   return {
     paths: [
       ...blogs.map((name) => {
-        return { params: { name } }
+        return { params: { name } };
       }),
     ],
     fallback: false, // 没有匹配的 path，返回 404
-  }
+  };
 }
 
 export async function getStaticProps({ params }: Params) {
   const [content] = await getBlogContent(params.name);
 
+  const html = compileMarkdown(content);
+
   return {
     props: {
       name: params.name,
       content,
+      html,
     }
-  }
+  };
 }
 
 export default function Blog(props: Props) {
@@ -41,7 +45,10 @@ export default function Blog(props: Props) {
       </Head>
       <div>
         <h1>{props.name}</h1>
+        <hr></hr>
         <p>{props.content}</p>
+        <hr></hr>
+        <div dangerouslySetInnerHTML={{ __html: props.html }}></div>
       </div>
     </div>
   );
