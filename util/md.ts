@@ -188,7 +188,7 @@ function formatMarkdown(str: string): string {
     }
 
     // 匹配行内代码块 `code`
-    let code = str.match(/`.+`/g);
+    let code = str.match(/`.+?`/g);
     if (code) {
         for (let i = 0, len = code.length; i < len; i++) {
             str = str.replace(code[i], "<code>" + code[i].substring(1, code[i].length - 1) + "</code>");
