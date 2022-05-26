@@ -6,7 +6,13 @@
 .container {
     /* display: flex; */
     /* max-width: 500px; */
-    width: 600px;
+    width: 767px;
+}
+
+@media (max-width: 767px) {
+    .container {
+        width: 767px;
+    }
 }
 
 .container h1 {

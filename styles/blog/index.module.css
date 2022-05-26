@@ -1,0 +1,14 @@
+.container {
+    display: flex;
+    justify-content: center;
+}
+
+.markdown {
+    width: 767px;
+}
+
+@media (max-width: 767px) {
+    .markdown {
+        padding: 15px;
+    }
+}
