@@ -201,7 +201,7 @@ function escapeHTML(str: string): string {
 }
 
 /**
- * 获取 Yaml formatter
+ * 仅获取 Yaml formatter
  */
 export async function getYamlFormatter(content: string): Promise<Map<string, string>> {
     const formatter = new Map();
