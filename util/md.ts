@@ -1,5 +1,8 @@
-export function compileMarkdown(str: string): string {
-    if (str == "") return "";
+export function compileMarkdown(str: string): [string, Map<string, string>] {
+    // yaml formatter
+    const formatter = new Map();
+
+    if (str == "") return ["", formatter];
 
     // 一行一行的匹配
     let rows = str.split("\n");
@@ -32,6 +35,8 @@ export function compileMarkdown(str: string): string {
             // ^```：
             || rows[i].match(/^```/)
 
+            || rows[i].match(/^---/)
+
             // 表格
             // ^\|.*\|：以 | 开头，匹配到 | 结束，中间无数个任意字符
             || rows[i].match(/^\|.*\|/);
@@ -40,6 +45,18 @@ export function compileMarkdown(str: string): string {
         if (matchArray) {
             // ['## ', index: 0, input: '## 0x3f3f3f3f\r', groups: undefined]
             switch (matchArray[0]) {
+                // 匹配 --- 之间的信息
+                case "---":
+                    const re0 = /^---/;
+                    i++;
+                    while (i < len && !re0.test(rows[i])) {
+                        const KV = rows[i].split(":");
+                        formatter.set(KV[0].trim(), KV[1].trim());
+                        i++;
+                    }
+                    i++;
+                    break;
+
                 // 匹配六级标题
                 case "# ":
                     html += `<h1>${formatMarkdown(rows[i].substring(2))}</h1>`;
@@ -150,7 +167,7 @@ export function compileMarkdown(str: string): string {
         }
     }
 
-    return html;
+    return [html, formatter];
 }
 
 // 这个部分专门用于匹配行内可能出现的 Markdown 标记
@@ -236,4 +253,25 @@ function escapeHTML(str: string): string {
             "\"": `&quot;`,
         }[tag] || tag)
     );
+}
+
+export async function getYamlFormatter(content: string): Promise<Map<string, string>> {
+    const formatter = new Map();
+
+    const re = /^---/;
+    let rows = content.split("\n");
+    for (let i = 0, len = rows.length; i < len; i++) {
+        const matchArr = rows[i].match(re);
+        if (matchArr && matchArr[0] === `---`) {
+            i++;
+            while (i < len && !re.test(rows[i])) {
+                const KV = rows[i].split(":");
+                formatter.set(KV[0].trim(), KV[1].trim());
+                i++;
+            }
+            i++;
+        }
+    }
+
+    return formatter;
 }

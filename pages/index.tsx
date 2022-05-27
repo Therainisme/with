@@ -2,17 +2,29 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import * as fs from 'fs';
-import { AsyncFuncReturnType, getBlogs } from '../util';
+import { AsyncFuncReturnType, getBlogContent, getBlogs } from '../util';
 import style from "../styles/index.module.css";
 
 type Props = AsyncFuncReturnType<typeof getStaticProps>['props'];
 
 export async function getStaticProps() {
-  const blogs = await getBlogs();
+  const blogsName = await getBlogs();
+  const blogsContent: string[] = [];
+  const blogsFormatter: Map<string, string>[] = [];
+  for (const name of blogsName) {
+    const [content, formatter] = await getBlogContent(name);
+    blogsContent.push(content);
+    blogsFormatter.push(formatter);
+  }
 
   return {
     props: {
-      blogs
+      blogs: blogsName.map((name, idx) => {
+        return {
+          name,
+          date: blogsFormatter[idx].get('date'),
+        };
+      })
     }
   };
 }
@@ -31,12 +43,12 @@ export default function Home(props: Props) {
           <p>There is nothing here.</p>
           <hr />
           {
-            props.blogs.map((name: string) => {
+            props.blogs.map((blog) => {
               return (
-                <Link key={name} href={`/blog/${name}`}>
+                <Link key={blog.name} href={`/blog/${blog.name}`}>
                   <h3 className={style.blog}>
-                    <a>{name}</a>
-                    <time>2022年5月26日</time>
+                    <a>{blog.name}</a>
+                    <time>{blog.date}</time>
                   </h3>
                 </Link>
               );

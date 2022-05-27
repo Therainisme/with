@@ -1,17 +1,19 @@
 import * as fs from 'fs';
+import { getYamlFormatter } from './md';
 
 export async function getBlogs() {
-    const dir = fs.opendirSync('blogs')
-    const blogs: string[] = []
+    const dir = fs.opendirSync('blogs');
+    const blogs: string[] = [];
     for await (const dirnet of dir) {
-        blogs.push(dirnet.name)
+        blogs.push(dirnet.name);
     }
-    return blogs
+    return blogs;
 }
 
-export async function getBlogContent(name: string): Promise<[string]> {
-    const content = fs.readFileSync(`blogs/${name}`, 'utf8')
-    return [content]
+export async function getBlogContent(name: string): Promise<[string, Map<string, string>]> {
+    const content = fs.readFileSync(`blogs/${name}`, 'utf8');
+    const formatter = await getYamlFormatter(content);
+    return [content, formatter];
 }
 
 // T extends U ? X : Y
