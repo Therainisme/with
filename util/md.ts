@@ -9,6 +9,10 @@ export function compileMarkdown(str: string): [string, Map<string, string>] {
     let matchArray;
     let html = "";
     for (let i = 0, len = rows.length; i < len; i++) {
+        const increment = () => {
+            return ++i;
+        };
+
         matchArray =
             // 匹配标题
             // ^A : 以 A 开头
@@ -47,14 +51,7 @@ export function compileMarkdown(str: string): [string, Map<string, string>] {
             switch (matchArray[0]) {
                 // 匹配 --- 之间的信息
                 case "---":
-                    const re0 = /^---/;
-                    i++;
-                    while (i < len && !re0.test(rows[i])) {
-                        const KV = rows[i].split(":");
-                        formatter.set(KV[0].trim(), KV[1].trim());
-                        i++;
-                    }
-                    i++;
+                    parseYamlFormatter(rows, formatter, increment);
                     break;
 
                 // 匹配六级标题
@@ -83,94 +80,41 @@ export function compileMarkdown(str: string): [string, Map<string, string>] {
                     break;
 
                 // 匹配引用 > 如果有多行引用则合并
-                // 无法匹配多级引用，而且我也暂时用不到多级引用
                 case "> ":
-                    let blockquote = "";
-                    let re1 = /^>\s/;
-                    while (i < len && rows[i].match(re1)) {
-                        blockquote += "<p>" + formatMarkdown(rows[i].substring(2, rows[i].length)) + "</p>";
-                        i++;
-                    }
-                    html += `<blockquote>${blockquote}</blockquote>`;
+                    html += compileBlockquote(rows, i, increment);
                     break;
 
                 // 匹配无序列表 * 无序列表
                 case "* ":
-                    let ul = "";
-                    let re2 = /^\*\s/;
-                    while (i < len && rows[i].match(re2)) {
-                        ul += "<li>" + formatMarkdown(rows[i].substring(2, rows[i].length)) + "</li>";
-                        i++;
-                    }
-                    html += `<ul>${ul}</ul>`;
+                    html += compileUnorderList(rows, i, increment);
                     break;
 
                 // 匹配有序列表 1. 有序列表
                 case rows[i].match(/^\d\.\s/) && rows[i].match(/^\d\.\s/)![0]:
-                    let ol = "";
-                    let re3 = /^\d\.\s/;
-                    while (i < len && rows[i].match(re3)) {
-                        ol += "<li>" + formatMarkdown(rows[i].substring(3, rows[i].length)) + "</li>";
-                        i++;
-                    }
-                    html += `<ol>${ol}</ol>`;
+                    html += compileOrderList(rows, i, increment);
                     break;
 
                 // 匹配多行代码块
                 case "```":
-                    let code = "";
-                    let re4 = /```\s*?$/;
-                    i++;
-                    while (i < len && !re4.test(rows[i])) {
-                        code += rows[i] + "\n";
-                        i++;
-                    }
-                    html += `<pre><code>${escapeHTML(code)}</code></pre>`;
+                    html += compileCodeBlock(rows, increment);
                     break;
 
                 // 匹配万恶的表格
-                // 没有匹配 |:-:| 此类的声明对齐方式
                 case rows[i].match(/^\|.*\|/) && rows[i].match(/^\|.*\|/)![0]:
-                    let temp = "";
-                    let re5 = /^\|.*\|/;
-                    let arry, j, jlen;
-                    let thead = false;
-                    while (i < len && re5.test(rows[i])) {
-                        arry = rows[i].split("|");
-                        temp += "<tr>";
-                        for (j = 1, jlen = arry.length - 1; j < jlen; j++) {
-                            if (thead === false) {
-                                temp += "<th>" + arry[j] + "</th>";
-                            } else {
-                                temp += "<td>" + arry[j] + "</td>";
-                            }
-                        }
-                        thead = true;
-                        temp += "</tr>";
-                        i++;
-                    }
-                    html += "<table>" + temp + "</table>";
+                    html += compileTable(rows, i, increment);
                     break;
             }
         } else {
-            // 如果都匹配不到，就是最简单的一个 p
-            // formatMarkdown(rows[i]) !== "&nbsp;" 防止出现空行
-            let re = /\s*/;
-            let matchArr = rows[i].match(re);
-            if (matchArr![0].length == rows[i].length) {
-                continue;
-            }
-
-            if (formatMarkdown(rows[i]) !== "&nbsp;") {
-                html += `<p>${formatMarkdown(rows[i])}</p>`;
-            }
+            html += compileUnmatch(rows[i]);
         }
     }
 
     return [html, formatter];
 }
 
-// 这个部分专门用于匹配行内可能出现的 Markdown 标记
+/**
+ * 这个部分专门用于匹配行内可能出现的 Markdown 标记
+ */
 function formatMarkdown(str: string): string {
     str = str.replace(/\s/g, " ");
 
@@ -239,9 +183,10 @@ function formatMarkdown(str: string): string {
     return str;
 }
 
-// 我当时在代码块里写了一个 #include <bits/stdc++.h>
-// 它只给我显示 #include
-// 给我干麻了
+/**
+ * 我当时在代码块里写了一个 `#include <bits/stdc++.h>`
+ * 它只给我显示 `#include`，给我干麻了
+ */
 function escapeHTML(str: string): string {
     return str.replace(
         /[&<>'"]/g,
@@ -255,6 +200,9 @@ function escapeHTML(str: string): string {
     );
 }
 
+/**
+ * 获取 Yaml formatter
+ */
 export async function getYamlFormatter(content: string): Promise<Map<string, string>> {
     const formatter = new Map();
 
@@ -274,4 +222,194 @@ export async function getYamlFormatter(content: string): Promise<Map<string, str
     }
 
     return formatter;
+}
+
+/**
+ * 
+ * 解析 yaml formatter
+ * 
+ * ```
+ * ---
+ * title: markdown 基本语法
+ * date: 2022-5-27
+ * ---
+ * ```
+ * 
+ * 第一行和最后一行跳过。
+ * 中间以: spilt，获取 KV 存储到 Map 中。
+ */
+function parseYamlFormatter(rows: string[], formatter: Map<string, string>, increment: () => number) {
+    const re = /^---/;
+    for (let i = increment(), len = rows.length; i < len && !re.test(rows[i]); i = increment()) {
+        const KV = rows[i].split(":");
+        formatter.set(KV[0].trim(), KV[1].trim());
+    }
+    increment();
+    return;
+}
+
+/**
+ * 
+ * 编译有序列表
+ * 
+ * ```
+ * 1. item1
+ * 2. item2
+ * 3. item3
+ * ```
+ * 
+ * 第 1 行 > 1. XXX，XXX 加入到结果里。
+ * 第 i + 1 行，如果还是无序列表，重复上面的步骤。
+ */
+function compileOrderList(rows: string[], nowIdx: number, increment: () => number): string {
+    let html = "";
+
+    let ol = "";
+    let re = /^\d\.\s/;
+    for (let i = nowIdx, len = rows.length; i < len && rows[i].match(re);) {
+        ol += "<li>" + formatMarkdown(rows[i].substring(3, rows[i].length)) + "</li>";
+        i = increment();
+    }
+    html += `<ol>${ol}</ol>`;
+
+    return html;
+}
+
+/**
+ * 
+ * 编译无序列表
+ * 
+ * ```
+ * * item1
+ * * item2
+ * * item3
+ * ```
+ * 
+ * 现在只匹配了 *。
+ * 第 1 行 > * XXX，XXX 加入到结果里。
+ * 第 i + 1 行，如果还是无序列表，重复上面的步骤。
+ */
+function compileUnorderList(rows: string[], nowIdx: number, increment: () => number): string {
+    let html = "";
+
+    let ul = "";
+    let re = /^\*\s/;
+    for (let i = nowIdx, len = rows.length; i < len && rows[i].match(re);) {
+        ul += "<li>" + formatMarkdown(rows[i].substring(2, rows[i].length)) + "</li>";
+        i = increment();
+    }
+    html += `<ul>${ul}</ul>`;
+
+    return html;
+}
+
+/**
+ * 
+ * 编译引用块
+ * 
+ * ```
+ * > 可以多行引用
+ * > 但是现在无法匹配多层引用
+ * ```
+ * 
+ * 第 1 行 > XXX，XXX 加入到结果里。
+ * 第 i + 1 行，如果还是引用块，重复上面的步骤。
+ */
+function compileBlockquote(rows: string[], nowIdx: number, increment: () => number): string {
+    let html = "";
+
+    let blockquote = "";
+    let re = /^>\s/;
+    for (let i = nowIdx, len = rows.length; i < len && rows[i].match(re);) {
+        blockquote += "<p>" + formatMarkdown(rows[i].substring(2, rows[i].length)) + "</p>";
+        i = increment();
+    }
+    html += `<blockquote>${blockquote}</blockquote>`;
+
+    return html;
+}
+
+/**
+ * 编译多行代码块
+ * 
+ * ```
+ * #include <bits/stc++.h>
+ * using namespace std;
+ * int main() {
+ *    cout << "Hello World" << endl;
+ *    return 0;
+ * }
+ * ```
+ * 
+ * 第 1 行，跳过。
+ * 第 2 ~ 行，原封不动的加入到结果里。
+ * 第 N 行，停止循环，并跳过 。
+ */
+function compileCodeBlock(rows: string[], increment: () => number): string {
+    let html = "";
+
+    let code = "";
+    let re = /```\s*?$/;
+
+    for (let i = increment(), len = rows.length; i < len && !re.test(rows[i]);) {
+        code += rows[i] + "\n";
+        i = increment();
+    }
+    increment();
+
+    html += `<pre><code>${escapeHTML(code)}</code></pre>`;
+
+    return html;
+}
+
+/**
+ * 
+ * 编译表格
+ * 没有匹配 `|:-:|` 此类的声明对齐方式
+ */
+function compileTable(rows: string[], nowIdx: number, increment: () => number): string {
+    let html = "";
+
+    let temp = "";
+    let re = /^\|.*\|/;
+    let arry, j, jlen;
+    let thead = false;  // 默认第一行作为表头
+    for (let i = nowIdx, len = rows.length; i < len && re.test(rows[i]); i = increment()) {
+        arry = rows[i].split("|");
+        temp += "<tr>";
+        for (j = 1, jlen = arry.length - 1; j < jlen; j++) {
+            if (thead === false) {
+                temp += "<th>" + arry[j] + "</th>";
+            } else {
+                temp += "<td>" + arry[j] + "</td>";
+            }
+        }
+        thead = true;
+        temp += "</tr>";
+    }
+    html += "<table>" + temp + "</table>";
+
+    return html;
+}
+
+/**
+ * 如果什么都匹配不到，就是最简单的一行，仅处理行内标记
+ */
+function compileUnmatch(line: string): string {
+
+    // 这部分代码用于防止出现空行 <p></p>
+    // 尝试匹配所有空白字符串，如果空白字符串长度等于原长度，说明该行可以不予处理
+    let re = /\s*/;
+    let matchArr = line.match(re);
+    if (matchArr![0].length == line.length) {
+        return "";
+    }
+
+    // 处理行内 markdown 标记
+    // let html = "";
+    // if (formatMarkdown(line) !== "&nbsp;") {
+    //     html += ;
+    // }
+
+    return `<p>${formatMarkdown(line)}</p>`;
 }
