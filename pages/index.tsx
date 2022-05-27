@@ -36,7 +36,7 @@ export default function Home(props: Props) {
       <main className={style.main}>
         <div className={style.container}>
           <h1>Therainisme</h1>
-          <p>there's nothing holding me back</p>
+          <p>{"there's nothing holding me back"}</p>
           <hr />
           {
             props.blogs
