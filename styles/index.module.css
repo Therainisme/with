@@ -39,6 +39,11 @@
     background: #efefef;
 }
 
+.blog time {
+    color: #999;
+    font-size: 16px;
+}
+
 @media (prefers-color-scheme: dark) {
 
     .container h1,
@@ -65,5 +70,16 @@
     .blog:hover {
         background: #7b7b7b;
         color: black !important;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .container {
+        width: 100%;
+    }
+
+    .blog {
+        flex-direction: column;
+        height: 80px;
     }
 }
