@@ -15,6 +15,7 @@ import remarkDirective from 'remark-directive';
 import remarkAdmonitions from '../../util/remark-plugin';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
+import remarkGfm from 'remark-gfm';
 // @ts-ignore 
 import rehypeKatex from 'rehype-katex';
 // @ts-ignore
@@ -50,11 +51,17 @@ export async function getStaticProps({ params }: Params) {
     {
       ...runtime as any,
       remarkPlugins: [
+        // support frontmatter (yaml, toml, and more)
         remarkFrontmatter,
 
+        // new syntax for directives (generic extensions)
         remarkDirective, remarkAdmonitions,
 
+        // new syntax for math (new node types, rehype compatible)
         remarkParse, remarkMath, remarkRehype, rehypeKatex, rehypeStringify,
+
+        // support GFM (autolink literals, footnotes, strikethrough, tables, tasklists)
+        remarkGfm,
       ],
     },
   );
