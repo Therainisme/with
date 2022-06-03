@@ -16,11 +16,11 @@ import remarkAdmonitions from '../../util/remark-plugin';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
 // @ts-ignore 
 import rehypeKatex from 'rehype-katex';
 // @ts-ignore
 import rehypeStringify from 'rehype-stringify';
-
 
 type Props = AsyncFuncReturnType<typeof getStaticProps>['props'];
 type Params = AsyncFuncReturnType<typeof getStaticPaths>['paths'][0];
@@ -62,6 +62,9 @@ export async function getStaticProps({ params }: Params) {
 
         // support GFM (autolink literals, footnotes, strikethrough, tables, tasklists)
         remarkGfm,
+      ],
+      rehypePlugins: [
+        rehypeHighlight
       ],
     },
   );

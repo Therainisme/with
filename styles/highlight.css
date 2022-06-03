@@ -1,0 +1,216 @@
+@media (prefers-color-scheme: light) {
+
+    /*
+    Theme: Tomorrow
+    Author: Chris Kempson (http://chriskempson.com)
+    License: ~ MIT (or more permissive) [via base16-schemes-source]
+    Maintainer: @highlightjs/core-team
+    Version: 2021.09.0
+*/
+    pre code.hljs {
+        display: block;
+        overflow-x: auto;
+        padding: 1em
+    }
+
+    code.hljs {
+        padding: 3px 5px
+    }
+
+    .hljs {
+        color: #4d4d4c;
+        background: #fff
+    }
+
+    .hljs ::selection,
+    .hljs::selection {
+        background-color: #d6d6d6;
+        color: #4d4d4c
+    }
+
+    .hljs-comment {
+        color: #8e908c
+    }
+
+    .hljs-tag {
+        color: #969896
+    }
+
+    .hljs-operator,
+    .hljs-punctuation,
+    .hljs-subst {
+        color: #4d4d4c
+    }
+
+    .hljs-operator {
+        opacity: .7
+    }
+
+    .hljs-bullet,
+    .hljs-deletion,
+    .hljs-name,
+    .hljs-selector-tag,
+    .hljs-template-variable,
+    .hljs-variable {
+        color: #c82829
+    }
+
+    .hljs-attr,
+    .hljs-link,
+    .hljs-literal,
+    .hljs-number,
+    .hljs-symbol,
+    .hljs-variable.constant_ {
+        color: #f5871f
+    }
+
+    .hljs-class .hljs-title,
+    .hljs-title,
+    .hljs-title.class_ {
+        color: #eab700
+    }
+
+    .hljs-strong {
+        font-weight: 700;
+        color: #eab700
+    }
+
+    .hljs-addition,
+    .hljs-code,
+    .hljs-string,
+    .hljs-title.class_.inherited__ {
+        color: #718c00
+    }
+
+    .hljs-built_in,
+    .hljs-doctag,
+    .hljs-keyword.hljs-atrule,
+    .hljs-quote,
+    .hljs-regexp {
+        color: #3e999f
+    }
+
+    .hljs-attribute,
+    .hljs-function .hljs-title,
+    .hljs-section,
+    .hljs-title.function_,
+    .ruby .hljs-property {
+        color: #4271ae
+    }
+
+    .diff .hljs-meta,
+    .hljs-keyword,
+    .hljs-template-tag,
+    .hljs-type {
+        color: #8959a8
+    }
+
+    .hljs-emphasis {
+        color: #8959a8;
+        font-style: italic
+    }
+
+    .hljs-meta,
+    .hljs-meta .hljs-keyword,
+    .hljs-meta .hljs-string {
+        color: #a3685a
+    }
+
+    .hljs-meta .hljs-keyword,
+    .hljs-meta-keyword {
+        font-weight: 700
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    /*
+        Theme: Rainbox
+    */
+
+    pre code.hljs {
+        display: block;
+        overflow-x: auto;
+        padding: 1em
+    }
+
+    code.hljs {
+        padding: 3px 5px
+    }
+
+    .hljs {
+        background: #474949;
+        color: #d1d9e1
+    }
+
+    .hljs-comment,
+    .hljs-quote {
+        color: #969896;
+        font-style: italic
+    }
+
+    .hljs-addition,
+    .hljs-keyword,
+    .hljs-literal,
+    .hljs-selector-tag,
+    .hljs-type {
+        color: #c9c
+    }
+
+    .hljs-number,
+    .hljs-selector-attr,
+    .hljs-selector-pseudo {
+        color: #f99157
+    }
+
+    .hljs-doctag,
+    .hljs-regexp,
+    .hljs-string {
+        color: #8abeb7
+    }
+
+    .hljs-built_in,
+    .hljs-name,
+    .hljs-section,
+    .hljs-title {
+        color: #b5bd68
+    }
+
+    .hljs-class .hljs-title,
+    .hljs-selector-id,
+    .hljs-template-variable,
+    .hljs-title.class_,
+    .hljs-variable {
+        color: #fc6
+    }
+
+    .hljs-name,
+    .hljs-section,
+    .hljs-strong {
+        font-weight: 700
+    }
+
+    .hljs-bullet,
+    .hljs-link,
+    .hljs-meta,
+    .hljs-subst,
+    .hljs-symbol {
+        color: #f99157
+    }
+
+    .hljs-deletion {
+        color: #dc322f
+    }
+
+    .hljs-formula {
+        background: #eee8d5
+    }
+
+    .hljs-attr,
+    .hljs-attribute {
+        color: #81a2be
+    }
+
+    .hljs-emphasis {
+        font-style: italic
+    }
+}
