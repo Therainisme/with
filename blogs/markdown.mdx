@@ -5,11 +5,11 @@ date: 2019-5-27
 
 [标题](#1) | [字体](#2) | [引用](#3) | [分割线](#4) | [图片](#5) | [超链接](#6) | [表格](#7)  
 
-## **<a id="1">一、标题**</a>
+## **<a id="1">一、标题</a>**
 
 支持六级标题
 
-## **<a id="2">二、字体**</a>
+## **<a id="2">二、字体</a>**
 
 **示例：**
 ```
@@ -26,7 +26,7 @@ date: 2019-5-27
 ***这是斜体加粗的文字***  
 ~~这是加删除线的文字~~  
 
-## **<a id="3">三、引用**</a>
+## **<a id="3">三、引用</a>**
 
 **示例：**
 
@@ -39,7 +39,7 @@ date: 2019-5-27
 > 这是引用的内容，里面应该能**加粗**
 > 但是不能有标题
 
-## **<a id="4">四、分割线**</a>
+## **<a id="4">四、分割线</a>**
 
 三个或者三个以上的 * 。
 
@@ -54,7 +54,7 @@ date: 2019-5-27
 
 *******
 
-## **<a id="5">五、图片**</a>
+## **<a id="5">五、图片</a>**
 
 **示例：**  
 ```
@@ -64,7 +64,7 @@ date: 2019-5-27
 **效果如下：**  
 ![kq](https://user-images.githubusercontent.com/41776735/163673800-0e575aa3-afab-405b-a833-212474a51adc.png)
 
-## **<a id="6">六、超链接**</a>
+## **<a id="6">六、超链接</a>**
 
 **示例：**  
 ```
@@ -76,7 +76,7 @@ date: 2019-5-27
 [简书](http://jianshu.com)
 [百度](http://baidu.com)  
 
-## **<a id="7">七、表格**</a>
+## **<a id="7">七、表格</a>**
 
 **示例：**  
 ```
@@ -94,3 +94,53 @@ date: 2019-5-27
 | 刘备 |  哭   | 大哥 |
 | 关羽 |  打   | 二哥 |
 | 张飞 |  骂   | 三弟 |
+
+## 我要开始尝试解析 HTML 了（优先级最低）
+
+~~直接解析 React 试试？~~
+
+如果某一行直接出现了 HTML，那么直接当作 HTML 解析。
+
+目前唯一的缺点就是不能换行写。
+
+```
+<div style={{backgroundImage: "linear-gradient( 135deg, #ABDCFF 10%, #0396FF 100%)", padding: "10px", textAlign: "center"}}>
+    <p>Test line</p>
+</div>
+```
+
+<div style={{backgroundImage: "linear-gradient( 135deg, #ABDCFF 10%, #0396FF 100%)", padding: "10px", textAlign: "center"}}>
+    <p>Test line</p>
+</div>
+
+## 数学
+
+$$
+f(x,y,z) = 3y^2z \left( 3+\frac{7x+5}{1+y^2} \right)
+$$
+
+## 告示框
+
+```
+:::note
+# 这里是一个标题
+if you chose xxx, you should also use yyy somewhere…
+:::
+```
+
+:::note
+# 这里是一个标题
+if you chose xxx, you should also use yyy somewhere…
+:::
+
+```
+:::note-danger
+# 这里是一个标题
+if you chose xxx, you should also use yyy somewhere…
+:::
+```
+
+:::note-danger
+# 这里是一个标题
+if you chose xxx, you should also use yyy somewhere…
+:::

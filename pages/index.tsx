@@ -1,30 +1,16 @@
-import type { NextPage } from 'next';
-import Head from 'next/head';
 import Link from 'next/link';
-import * as fs from 'fs';
-import { AsyncFuncReturnType, getBlogContent, getBlogs } from '../util';
+import { AsyncFuncReturnType, getBlogs } from '../util';
 import style from "../styles/index.module.css";
 import MyHead from '../components/MyHead';
 
 type Props = AsyncFuncReturnType<typeof getStaticProps>['props'];
 
 export async function getStaticProps() {
-  const blogsName = await getBlogs();
-  const blogsFormatter: Map<string, string>[] = [];
-  for (const name of blogsName) {
-    const [_, formatter] = await getBlogContent(name);
-    blogsFormatter.push(formatter);
-  }
+  const blogs = await getBlogs();
 
   return {
     props: {
-      blogs: blogsName.map((name, idx) => {
-        return {
-          name,
-          title: blogsFormatter[idx].get('title'),
-          date: blogsFormatter[idx].get('date'),
-        };
-      })
+      blogs
     }
   };
 }
@@ -42,7 +28,7 @@ export default function Home(props: Props) {
             props.blogs
               .sort((a, b) => b.date!.localeCompare(a.date!))
               .map((blog) => (
-                <Link key={blog.title} href={`/blog/${blog.name}`}>
+                <Link key={blog.title} href={`/blog/${blog.file}`}>
                   <h3 className={style.blog}>
                     <a>{blog.title}</a>
                     <time>{blog.date}</time>

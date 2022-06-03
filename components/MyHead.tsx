@@ -17,6 +17,7 @@ export default function MyHead(props: Props) {
                 <meta key={meta.name} name={meta.name} content={meta.content} />
             ))}
             <link rel="icon" href="/favicon.ico" />
+            <link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/katex@0.15.6/dist/katex.min.css" integrity="sha384-ZPe7yZ91iWxYumsBEOn7ieg8q/o+qh/hQpSaPow8T6BwALcXSCS6C6fSRPIAnTQs" crossOrigin="anonymous"></link>
         </Head>
     );
 }

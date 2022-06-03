@@ -43,7 +43,10 @@ export function compileMarkdown(str: string): [string, Map<string, string>] {
 
             // 表格
             // ^\|.*\|：以 | 开头，匹配到 | 结束，中间无数个任意字符
-            || rows[i].match(/^\|.*\|/);
+            || rows[i].match(/^\|.*\|/)
+
+            // HTML 标签
+            || rows[i].match(/<.*?>/);
 
 
         if (matchArray) {
@@ -102,6 +105,11 @@ export function compileMarkdown(str: string): [string, Map<string, string>] {
                 // 匹配万恶的表格
                 case rows[i].match(/^\|.*\|/) && rows[i].match(/^\|.*\|/)![0]:
                     html += compileTable(rows, i, increment);
+                    break;
+
+                // 匹配 HTML 标签
+                case rows[i].match(/<.*?>/) && rows[i].match(/<.*?>/)![0]:
+                    html += rows[i];
                     break;
             }
         } else {
