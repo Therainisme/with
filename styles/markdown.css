@@ -1104,3 +1104,19 @@ h6 {
 .markdown-body .admonition-danger h6 {
     color: var(--color-admonition-danger-heading);
 }
+
+/* headings anchor */
+.markdown-body h2 a {
+    color: rgb(52, 172, 224);
+    margin-left: 5px;
+    transition: all 0.25s;
+    opacity: 0;
+}
+
+.markdown-body h2:hover a {
+    opacity: 1;
+}
+
+.markdown-body h2 a span::after {
+    content: '#';
+}

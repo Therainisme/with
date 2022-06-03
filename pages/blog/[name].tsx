@@ -6,7 +6,7 @@ import MyHead from '../../components/MyHead';
 // parse markdown
 import { renderToString } from 'react-dom/server';
 import matter from "gray-matter";
-import { evaluateSync } from '@mdx-js/mdx';
+import { compileSync, createProcessor, evaluateSync } from '@mdx-js/mdx';
 import * as fs from 'fs';
 import * as runtime from 'react/jsx-runtime';
 import remarkFrontmatter from 'remark-frontmatter';
@@ -17,6 +17,8 @@ import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
+import rehypeSlug from 'rehype-slug';
+import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 // @ts-ignore 
 import rehypeKatex from 'rehype-katex';
 // @ts-ignore
@@ -24,6 +26,32 @@ import rehypeStringify from 'rehype-stringify';
 
 type Props = AsyncFuncReturnType<typeof getStaticProps>['props'];
 type Params = AsyncFuncReturnType<typeof getStaticPaths>['paths'][0];
+
+// https://mdxjs.com/packages/mdx/#evaluatefile-options
+// https://github.com/rehypejs/rehype/blob/main/doc/plugins.md#list-of-plugins
+const remarkOptions = {
+  ...runtime as any,
+  remarkPlugins: [
+    // support frontmatter (yaml, toml, and more)
+    remarkFrontmatter,
+
+    // new syntax for directives (generic extensions)
+    remarkDirective, remarkAdmonitions,
+
+    // new syntax for math (new node types, rehype compatible)
+    remarkParse, remarkMath, remarkRehype, rehypeKatex, rehypeStringify,
+
+    // support GFM (autolink literals, footnotes, strikethrough, tables, tasklists)
+    remarkGfm,
+  ],
+  rehypePlugins: [
+    // highliht code blocks
+    [rehypeHighlight],
+
+    // auto link headings
+    [rehypeSlug], [rehypeAutolinkHeadings, { behavior: 'append' }],
+  ],
+};
 
 export async function getStaticPaths() {
   const blogs = await getBlogs();
@@ -46,28 +74,7 @@ export async function getStaticProps({ params }: Params) {
   const file = fs.readFileSync(`blogs/${params.name}`);
 
   // https://mdxjs.com/packages/mdx/#evaluatefile-options
-  const { default: MDXContent } = evaluateSync(
-    file,
-    {
-      ...runtime as any,
-      remarkPlugins: [
-        // support frontmatter (yaml, toml, and more)
-        remarkFrontmatter,
-
-        // new syntax for directives (generic extensions)
-        remarkDirective, remarkAdmonitions,
-
-        // new syntax for math (new node types, rehype compatible)
-        remarkParse, remarkMath, remarkRehype, rehypeKatex, rehypeStringify,
-
-        // support GFM (autolink literals, footnotes, strikethrough, tables, tasklists)
-        remarkGfm,
-      ],
-      rehypePlugins: [
-        rehypeHighlight
-      ],
-    },
-  );
+  const { default: MDXContent } = evaluateSync(file, remarkOptions);
 
   // 这里可以传 Props: MDXContent(props)
   const html = renderToString(MDXContent({}));
