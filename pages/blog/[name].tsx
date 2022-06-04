@@ -2,6 +2,7 @@ import React from 'react';
 import { AsyncFuncReturnType, getBlogs } from '../../util';
 import style from "../../styles/blog/index.module.css";
 import MyHead from '../../components/MyHead';
+import Link from 'next/link';
 
 // parse markdown
 import { renderToString } from 'react-dom/server';
@@ -27,10 +28,10 @@ import rehypeStringify from 'rehype-stringify';
 type Props = AsyncFuncReturnType<typeof getStaticProps>['props'];
 type Params = AsyncFuncReturnType<typeof getStaticPaths>['paths'][0];
 
-// https://mdxjs.com/packages/mdx/#evaluatefile-options
-// https://github.com/rehypejs/rehype/blob/main/doc/plugins.md#list-of-plugins
 const remarkOptions = {
   ...runtime as any,
+
+  // https://github.com/remarkjs/remark/blob/main/doc/plugins.md#list-of-plugins
   remarkPlugins: [
     // support frontmatter (yaml, toml, and more)
     remarkFrontmatter,
@@ -44,6 +45,8 @@ const remarkOptions = {
     // support GFM (autolink literals, footnotes, strikethrough, tables, tasklists)
     remarkGfm,
   ],
+
+  // https://github.com/rehypejs/rehype/blob/main/doc/plugins.md#list-of-plugins
   rehypePlugins: [
     // highliht code blocks
     [rehypeHighlight],
@@ -71,6 +74,8 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }: Params) {
+  const recentBlogs = await getBlogs();
+
   const file = fs.readFileSync(`blogs/${params.name}`);
 
   // https://mdxjs.com/packages/mdx/#evaluatefile-options
@@ -87,20 +92,48 @@ export async function getStaticProps({ params }: Params) {
       name: params.name,
       html,
       title: frontmatter.title,
+      recentBlogs
     }
   };
 }
 
 export default function Blog(props: Props) {
-  const { name, html, title } = props;
+  const { name, html, title, recentBlogs } = props;
 
   return (
     <div>
-      <MyHead title={`${name} - blog`} />
+      <MyHead title={`${title} - blog`} />
       <div className={style.container}>
+        <div className={style.sidebar}>
+          <h2>Recent</h2>
+          <ul>
+            {recentBlogs.map((blog) => (
+              <li key={blog.file} className={blog.file === name ? style.sidebarItemActive : ''}>
+                <Link href={`/blog/${blog.file}`}>
+                  {blog.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+        </div>
         <div className={`${style.markdown} markdown-body`}>
           <h1>{title}</h1>
           <div dangerouslySetInnerHTML={{ __html: html }}></div>
+        </div>
+        <div className={style.sidebar}>
+          <h2>Catalog</h2>
+          <ul>
+            <li>
+              <a>现在这个目录是一个假目录</a>
+            </li>
+            <li>
+              <a>现在这个目录是一个假目录</a>
+            </li>
+            <li>
+              <a>现在这个目录是一个假目录</a>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
