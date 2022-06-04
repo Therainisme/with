@@ -1105,9 +1105,13 @@ h6 {
     color: var(--color-admonition-danger-heading);
 }
 
+.markdown-body a {
+    color: var(--theme-color);
+}
+
 /* headings anchor */
 .markdown-body h2 a {
-    color: rgb(52, 172, 224);
+    color: var(--theme-color);
     margin-left: 5px;
     transition: all 0.25s;
     opacity: 0;
