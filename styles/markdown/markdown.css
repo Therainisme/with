@@ -1124,3 +1124,14 @@ h6 {
 .markdown-body h2 a span::after {
     content: '#';
 }
+
+
+/* markdown scrollbar */
+.markdown-body ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.markdown-body ::-webkit-scrollbar-thumb {
+    background-color: #c9d1d9;
+}
