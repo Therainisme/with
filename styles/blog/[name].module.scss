@@ -40,11 +40,21 @@
         .sidebarItemActive {
             color: var(--theme-color);
         }
+
+        .catalogItem {
+            font-size: .8rem;
+        }
     }
 
     @media screen and (max-width: 767px) {
         .markdown {
             width: 100%;
+        }
+    }
+
+    @media screen and (max-width: 1000px) {
+        .sidebar {
+            display: none;
         }
     }
 }

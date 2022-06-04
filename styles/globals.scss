@@ -6,6 +6,8 @@ body {
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif !important;
 
   --theme-color: rgb(52, 172, 224);
+
+  --color-fg-default: #c9d1d9;
 }
 
 a {
@@ -22,5 +24,6 @@ a {
   html,
   body {
     background: #0d1117;
+    color: var(--color-fg-default);
   }
 }

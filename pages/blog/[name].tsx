@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { AsyncFuncReturnType, getBlogs } from '../../util';
 import style from "../../styles/blog/[name].module.scss";
 import MyHead from '../../components/MyHead';
@@ -7,7 +7,7 @@ import Link from 'next/link';
 // parse markdown
 import { renderToString } from 'react-dom/server';
 import matter from "gray-matter";
-import { compileSync, createProcessor, evaluateSync } from '@mdx-js/mdx';
+import { evaluateSync } from '@mdx-js/mdx';
 import * as fs from 'fs';
 import * as runtime from 'react/jsx-runtime';
 import remarkFrontmatter from 'remark-frontmatter';
@@ -61,13 +61,14 @@ export async function getStaticPaths() {
 
   return {
     paths: [
-      ...blogs.map((blog) => {
-        return {
-          params: {
-            name: blog.file
-          }
-        };
-      }),
+      ...blogs
+        .map((blog) => {
+          return {
+            params: {
+              name: blog.file
+            }
+          };
+        }),
     ],
     fallback: false, // 没有匹配的 path，返回 404
   };
@@ -92,13 +93,106 @@ export async function getStaticProps({ params }: Params) {
       name: params.name,
       html,
       title: frontmatter.title,
-      recentBlogs
+      recentBlogs: recentBlogs.sort((a, b) => b.date!.localeCompare(a.date!)),
     }
   };
 }
 
 export default function Blog(props: Props) {
   const { name, html, title, recentBlogs } = props;
+
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [catalog, setCatalog] = useState<Heading[]>([]);
+
+  // 生成侧边目录
+  useEffect(() => {
+    const root = contentRef.current;
+    if (!root || !root.firstChild) return;
+
+
+    let el = root.firstChild;
+    /** 
+     * 迭代器：获取下一个 Heading
+    */
+    function headingElementIterator() {
+      if (!el.previousSibling && (el.nodeName === "H2" || el.nodeName === "H3" || el.nodeName === "H4")) {
+        const returnEl = el;
+        if (el.nextSibling) el = el.nextSibling;
+        return returnEl;
+      }
+
+      do {
+        if (!el.nextSibling) return null;
+        el = el.nextSibling;
+      } while (!(el.nodeName === "H2" || el.nodeName === "H3" || el.nodeName === "H4"));
+
+      return el;
+    }
+
+    /**
+     * 超前查看下一个 Heading
+     */
+    function getNextHeading(el: ChildNode): ChildNode | null {
+      let rtEl = el;
+
+      do {
+        if (!rtEl.nextSibling) return null;
+        rtEl = rtEl.nextSibling;
+      } while (!(rtEl.nodeName === "H2" || rtEl.nodeName === "H3" || rtEl.nodeName === "H4"));
+
+      return rtEl;
+    }
+
+    /**
+     * 转换深度 (HX) => X
+     */
+    function getHeadingDepth(nodeName: string): number {
+      switch (nodeName) {
+        case "H2":
+          return 2;
+        case "H3":
+          return 3;
+        case "H4":
+          return 4;
+        default:
+          return -1;
+      }
+    }
+
+    // 递归建树
+    function buildSubHeading(father: Heading, depth: number, HeadingIterator: () => ChildNode | null) {
+      let it: ChildNode | null;
+      do {
+        it = HeadingIterator();
+        if (!it) return;
+
+        father.subHeading!.push({
+          // @ts-ignore
+          id: it.getAttribute('id'),
+          content: it.textContent!,
+          depth,
+          subHeading: []
+        });
+
+        // 超前检测下一个 Heading
+        const nextHeading = getNextHeading(it);
+        if (!nextHeading) return;
+        if (getHeadingDepth(nextHeading.nodeName) > depth) {
+          // 构建子目录
+          buildSubHeading(father.subHeading![father.subHeading!.length - 1], depth + 1, HeadingIterator);
+        } else if (getHeadingDepth(nextHeading.nodeName) < depth) {
+          // 停止递归
+          return;
+        }
+
+      } while (getHeadingDepth(it.nodeName) === depth);
+    }
+
+    const rootHeading: Heading = { id: "-1", content: 'root heading', depth: 1, subHeading: [] };
+    buildSubHeading(rootHeading, 2, headingElementIterator);
+
+    setCatalog(rootHeading.subHeading ? rootHeading.subHeading : []);
+  }, []);
 
   return (
     <div>
@@ -119,23 +213,35 @@ export default function Blog(props: Props) {
         </div>
         <div className={`${style.markdown} markdown-body`}>
           <h1>{title}</h1>
-          <div dangerouslySetInnerHTML={{ __html: html }}></div>
+          <div ref={contentRef} dangerouslySetInnerHTML={{ __html: html }}></div>
         </div>
         <div className={style.sidebar}>
           <h2>Catalog</h2>
           <ul>
-            <li>
-              <a>现在这个目录是一个假目录</a>
-            </li>
-            <li>
-              <a>现在这个目录是一个假目录</a>
-            </li>
-            <li>
-              <a>现在这个目录是一个假目录</a>
-            </li>
+            {headingArrayMapToCatalog(catalog)}
           </ul>
         </div>
       </div>
     </div>
   );
+}
+
+type Heading = {
+  id: string;
+  content: string;
+  depth: number;
+  subHeading?: Heading[];
+};
+
+function headingArrayMapToCatalog(headings: Heading[]): any {
+  return headings.map((item) => {
+    return (
+      <>
+        <li className={style.catalogItem} key={item.content + item.depth} style={{ marginLeft: (item.depth - 2) * 20 }}>
+          <a href={`#${item.id}`}>{item.content}</a>
+        </li>
+        {item.subHeading && headingArrayMapToCatalog(item.subHeading)}
+      </>
+    );
+  });
 }
