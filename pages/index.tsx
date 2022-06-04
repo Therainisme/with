@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { AsyncFuncReturnType, getBlogs } from '../util';
-import style from "../styles/index.module.css";
+import style from "../styles/index.module.scss";
 import MyHead from '../components/MyHead';
 
 type Props = AsyncFuncReturnType<typeof getStaticProps>['props'];

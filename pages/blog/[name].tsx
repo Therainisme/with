@@ -1,6 +1,6 @@
 import React from 'react';
 import { AsyncFuncReturnType, getBlogs } from '../../util';
-import style from "../../styles/blog/index.module.css";
+import style from "../../styles/blog/[name].module.scss";
 import MyHead from '../../components/MyHead';
 import Link from 'next/link';
 

@@ -4,19 +4,17 @@
 }
 
 .container {
-    /* display: flex; */
-    /* max-width: 500px; */
     width: 767px;
     padding: 16px;
-}
 
-.container h1 {
-    text-align: center;
-    font-weight: 600;
-}
+    h1 {
+        text-align: center;
+        font-weight: 600;
+    }
 
-.container p {
-    text-align: center;
+    p {
+        text-align: center;
+    }
 }
 
 .blog {
@@ -33,31 +31,35 @@
     padding: 0 10px;
     font-weight: 400;
     color: #555 !important;
-}
 
-.blog:hover {
-    background: #efefef;
-}
+    &:hover {
 
-.blog time {
-    color: #999;
-    font-size: 16px;
+        background: #efefef;
+    }
+
+    time {
+        color: #999;
+        font-size: 16px;
+    }
 }
 
 @media (prefers-color-scheme: dark) {
 
-    .container h1,
-    .container p {
-        color: #c9d1d9 !important;
+    .container {
+
+        h1,
+        p {
+            color: #c9d1d9 !important;
+        }
     }
 
     .blog {
         color: #c9d1d9 !important;
-    }
 
-    .blog:hover {
-        background: #7b7b7b;
-        color: black !important;
+        &:hover {
+            background: #7b7b7b;
+            color: black !important;
+        }
     }
 }
 

@@ -1,9 +1,9 @@
-import '../styles/globals.css';
+import '../styles/globals.scss';
 import type { AppProps } from 'next/app';
 import { useMediaPredicate } from 'react-media-hook';
 
-import "../styles/markdown.css";
-import "../styles/highlight.css";
+import "../styles/markdown/markdown.css";
+import "../styles/markdown/highlight.css";
 
 function MyApp({ Component, pageProps }: AppProps) {
   // todo 检测浏览器主题
