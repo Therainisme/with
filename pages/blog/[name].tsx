@@ -192,7 +192,7 @@ export default function Blog(props: Props) {
     buildSubHeading(rootHeading, 2, headingElementIterator);
 
     setCatalog(rootHeading.subHeading ? rootHeading.subHeading : []);
-  }, []);
+  }, [name]);
 
   return (
     <div>
