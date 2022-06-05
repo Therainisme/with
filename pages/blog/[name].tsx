@@ -236,12 +236,12 @@ type Heading = {
 function headingArrayMapToCatalog(headings: Heading[]): any {
   return headings.map((item) => {
     return (
-      <>
-        <li className={style.catalogItem} key={item.content + item.depth} style={{ marginLeft: (item.depth - 2) * 20 }}>
+      <span key={`${item.id}${item.content}${item.depth}`}>
+        <li className={style.catalogItem} style={{ marginLeft: (item.depth - 2) * 20 }}>
           <a href={`#${item.id}`}>{item.content}</a>
         </li>
         {item.subHeading && headingArrayMapToCatalog(item.subHeading)}
-      </>
+      </span>
     );
   });
 }
