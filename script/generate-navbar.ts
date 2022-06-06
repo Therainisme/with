@@ -24,7 +24,7 @@ async function getBlogs() {
             date
         });
     }
-    return blogs;
+    return blogs.sort((a, b) => b.date!.localeCompare(a.date!));
 }
 
 async function run() {

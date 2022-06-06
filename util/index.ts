@@ -19,7 +19,7 @@ export async function getBlogs() {
             date: component.date
         });
     }
-    return blogs;
+    return blogs.sort((a, b) => b.date!.localeCompare(a.date!));
 }
 
 // T extends U ? X : Y
