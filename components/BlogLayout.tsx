@@ -3,6 +3,7 @@ import MyHead from "./MyHead";
 import style from "../styles/blog/BlogLayout.module.scss";
 import { useEffect, useRef, useState } from "react";
 import { Blog } from '../util';
+import { recentBlogs } from '../util/navbar';
 
 type Props = {
   title: string;
@@ -13,12 +14,21 @@ type Props = {
 
 const dev = process.env.NODE_ENV !== 'production';
 
-export const server = dev ? 'http://localhost:3000' : 'https://with.vivy.host';
+async function getRecentBlogs() {
+  if (dev) {
+    // yarn dev
+    const response = await fetch(`http://localhost:3000/api/recent-blogs`);
+    const recentBlogs = await response.json();
+    return recentBlogs;
+  } else {
+    // yarn build
+    return recentBlogs;
+  }
+}
 
 export function withGetStaticProps(title: string, date: string) {
   return async () => {
-    const response = await fetch(`${server}/api/recent-blogs`);
-    const recentBlogs = await response.json();
+    const recentBlogs = await getRecentBlogs();
 
     return {
       props: {

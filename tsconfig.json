@@ -23,7 +23,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "util/remark-plugin.js"
+    "util/remark-plugin.js",
   ],
   "exclude": [
     "node_modules"

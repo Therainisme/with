@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-export function TwoIntersectingRectangles() {
+export default function TwoIntersectingRectangles() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
