@@ -28,7 +28,7 @@ export default function Home(props: Props) {
             props.blogs
               .sort((a, b) => b.date!.localeCompare(a.date!))
               .map((blog) => (
-                <Link key={blog.title} href={`/blog/${blog.file}`}>
+                <Link key={blog.title} href={blog.path}>
                   <h3 className={style.blog}>
                     <a>{blog.title}</a>
                     <time>{blog.date}</time>

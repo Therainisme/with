@@ -1,9 +1,12 @@
----
-title: 关于 0x3f3f3f3f 与 memset(a, 0x3f, sizeof a)
-authors: [Therainisme]
-tags: [Algorithm]
-date: 2022-2-18
----
+import {BlogLayout, withGetStaticProps} from "../../components/BlogLayout";
+
+export const title = "关于 0x3f3f3f3f 与 memset(a, 0x3f, sizeof a)"
+export const date = "2022-02-18";
+export const getStaticProps = withGetStaticProps(title, date);
+export default (props) => {
+  return BlogLayout(props);
+};
+
 
 在算法题中，一般无穷大常量取值可以是 0x3f3f3f3f。
 

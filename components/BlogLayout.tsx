@@ -1,105 +1,38 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { AsyncFuncReturnType, getBlogs } from '../../util';
-import style from "../../styles/blog/[name].module.scss";
-import MyHead from '../../components/MyHead';
-import Link from 'next/link';
+import Link from "next/link";
+import MyHead from "./MyHead";
+import style from "../styles/blog/BlogLayout.module.scss";
+import { useEffect, useRef, useState } from "react";
+import { Blog } from '../util';
 
-// parse markdown
-import { renderToString } from 'react-dom/server';
-import matter from "gray-matter";
-import { evaluateSync } from '@mdx-js/mdx';
-import * as fs from 'fs';
-import * as runtime from 'react/jsx-runtime';
-import remarkFrontmatter from 'remark-frontmatter';
-import remarkMath from 'remark-math';
-import remarkDirective from 'remark-directive';
-import remarkAdmonitions from '../../util/remark-plugin';
-import remarkParse from 'remark-parse';
-import remarkRehype from 'remark-rehype';
-import remarkGfm from 'remark-gfm';
-import rehypeHighlight from 'rehype-highlight';
-import rehypeSlug from 'rehype-slug';
-import rehypeAutolinkHeadings from 'rehype-autolink-headings';
-// @ts-ignore 
-import rehypeKatex from 'rehype-katex';
-// @ts-ignore
-import rehypeStringify from 'rehype-stringify';
-
-type Props = AsyncFuncReturnType<typeof getStaticProps>['props'];
-type Params = AsyncFuncReturnType<typeof getStaticPaths>['paths'][0];
-
-const remarkOptions = {
-  ...runtime as any,
-
-  // https://github.com/remarkjs/remark/blob/main/doc/plugins.md#list-of-plugins
-  remarkPlugins: [
-    // support frontmatter (yaml, toml, and more)
-    remarkFrontmatter,
-
-    // new syntax for directives (generic extensions)
-    remarkDirective, remarkAdmonitions,
-
-    // new syntax for math (new node types, rehype compatible)
-    remarkParse, remarkMath, remarkRehype, rehypeKatex, rehypeStringify,
-
-    // support GFM (autolink literals, footnotes, strikethrough, tables, tasklists)
-    remarkGfm,
-  ],
-
-  // https://github.com/rehypejs/rehype/blob/main/doc/plugins.md#list-of-plugins
-  rehypePlugins: [
-    // highliht code blocks
-    [rehypeHighlight],
-
-    // auto link headings
-    [rehypeSlug], [rehypeAutolinkHeadings, { behavior: 'append' }],
-  ],
+type Props = {
+  title: string;
+  date: string;
+  recentBlogs: Blog[];
+  children: React.ReactNode;
 };
 
-export async function getStaticPaths() {
-  const blogs = await getBlogs();
+const dev = process.env.NODE_ENV !== 'production';
 
-  return {
-    paths: [
-      ...blogs
-        .map((blog) => {
-          return {
-            params: {
-              name: blog.file
-            }
-          };
-        }),
-    ],
-    fallback: false, // 没有匹配的 path，返回 404
+export const server = dev ? 'http://localhost:3000' : 'https://with.vivy.host';
+
+export function withGetStaticProps(title: string, date: string) {
+  return async () => {
+    const response = await fetch(`${server}/api/recent-blogs`);
+    const recentBlogs = await response.json();
+
+    return {
+      props: {
+        title,
+        date,
+        recentBlogs: recentBlogs,
+      }
+    };
   };
 }
 
-export async function getStaticProps({ params }: Params) {
-  const recentBlogs = await getBlogs();
+export function BlogLayout(props: Props) {
 
-  const file = fs.readFileSync(`blogs/${params.name}`);
-
-  // https://mdxjs.com/packages/mdx/#evaluatefile-options
-  const { default: MDXContent } = evaluateSync(file, remarkOptions);
-
-  // 这里可以传 Props: MDXContent(props)
-  const html = renderToString(MDXContent({}));
-
-  // https://github.com/jonschlinkert/gray-matter#what-does-this-do
-  const frontmatter = matter(file).data;
-
-  return {
-    props: {
-      name: params.name,
-      html,
-      title: frontmatter.title,
-      recentBlogs: recentBlogs.sort((a, b) => b.date!.localeCompare(a.date!)),
-    }
-  };
-}
-
-export default function Blog(props: Props) {
-  const { name, html, title, recentBlogs } = props;
+  const { title, recentBlogs, children } = props;
 
   const contentRef = useRef<HTMLDivElement>(null);
   const [catalog, setCatalog] = useState<Heading[]>([]);
@@ -192,7 +125,7 @@ export default function Blog(props: Props) {
     buildSubHeading(rootHeading, 2, headingElementIterator);
 
     setCatalog(rootHeading.subHeading ? rootHeading.subHeading : []);
-  }, [name]);
+  }, [title]);
 
   return (
     <div>
@@ -201,9 +134,9 @@ export default function Blog(props: Props) {
         <div className={style.sidebar}>
           <h2>Recent</h2>
           <ul>
-            {recentBlogs.map((blog) => (
-              <li key={blog.file} className={blog.file === name ? style.sidebarItemActive : ''}>
-                <Link href={`/blog/${blog.file}`}>
+            {recentBlogs?.map((blog) => (
+              <li key={blog.path} className={blog.title === title ? style.sidebarItemActive : ''}>
+                <Link href={blog.path}>
                   {blog.title}
                 </Link>
               </li>
@@ -213,7 +146,9 @@ export default function Blog(props: Props) {
         </div>
         <div className={`${style.markdown} markdown-body`}>
           <h1>{title}</h1>
-          <div ref={contentRef} dangerouslySetInnerHTML={{ __html: html }}></div>
+          <div ref={contentRef}>
+            {children}
+          </div>
         </div>
         <div className={style.sidebar}>
           <h2>Catalog</h2>
@@ -226,6 +161,8 @@ export default function Blog(props: Props) {
   );
 }
 
+// component end
+
 type Heading = {
   id: string;
   content: string;
@@ -234,7 +171,7 @@ type Heading = {
 };
 
 function headingArrayMapToCatalog(headings: Heading[]): any {
-  return headings.map((item) => {
+  return headings?.map((item) => {
     return (
       <span key={`${item.id}${item.content}${item.depth}`}>
         <li className={style.catalogItem} style={{ marginLeft: (item.depth - 2) * 20 }}>

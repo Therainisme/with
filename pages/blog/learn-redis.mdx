@@ -1,9 +1,12 @@
----
-title: 尝试在不需要使用 Redis 的情景下使用上 Redis
-authors: [Therainisme]
-tags: [Redis]
-date: 2022-5-4
----
+import {BlogLayout, withGetStaticProps} from "../../components/BlogLayout";
+
+export const title = "尝试在不需要使用 Redis 的情景下使用上 Redis"
+export const date = "2022-05-04";
+export const getStaticProps = withGetStaticProps(title, date);
+export default (props) => {
+  return BlogLayout(props);
+};
+
 
 ## 不管怎么说先先想办法 Run 起来
 

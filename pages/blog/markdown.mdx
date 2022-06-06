@@ -1,7 +1,12 @@
----
-title: 这个是我用来测试 markdown 能不能正常解析用的
-date: 2019-5-27
----
+import {BlogLayout, withGetStaticProps} from "../../components/BlogLayout";
+
+export const title = "这个是我用来测试 markdown 能不能正常解析用的";
+export const date = "2019-05-27";
+export const getStaticProps = withGetStaticProps(title, date);
+export default (props) => {
+  return BlogLayout(props);
+};
+
 
 ## 一、标题
 
@@ -129,9 +134,7 @@ A note[^1]
 
 ## 数学
 
-$$
-f(x,y,z) = 3y^2z \left( 3+\frac{7x+5}{1+y^2} \right)
-$$
+
 
 ## 告示框
 

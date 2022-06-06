@@ -1,17 +1,11 @@
-// List of plugins
-// https://github.com/remarkjs/remark/blob/main/doc/plugins.md#list-of-plugins
-
-/** @typedef {import('remark-directive')} */
-
 import { visit } from 'unist-util-visit';
 import { h } from 'hastscript';
 
 /**
- * @type {import('unified').Plugin<[], import('mdast').Root>}
  * https://github.com/remarkjs/remark-directive#example-styled-blocks
  */
-export default function remarkAdmonitions() {
-  return (tree: any) => {
+export function remarkAdmonitions() {
+  return (tree) => {
     visit(tree, (node) => {
       if (
         node.type === 'textDirective' ||

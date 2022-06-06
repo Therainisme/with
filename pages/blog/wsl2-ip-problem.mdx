@@ -1,9 +1,13 @@
----
-title: 解决 WSL2 每次启动 IP 地址都会变的蛋疼问题
-authors: [Therainisme]
-tags: [WSL]
-date: 2022-5-10
----
+import {BlogLayout, withGetStaticProps} from "../../components/BlogLayout";
+
+export const title = "解决 WSL2 每次启动 IP 地址都会变的蛋疼问题";
+export const date = "2022-05-10";
+export const getStaticProps = withGetStaticProps(title, date);
+export default (props) => {
+  return BlogLayout(props);
+};
+
+
 
 WSL2 好是好啊，跑在 Hyper-V 的大病就是 IP 一直变一直变。
 

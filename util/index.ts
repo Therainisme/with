@@ -1,22 +1,22 @@
 import * as fs from 'fs';
-import matter from 'gray-matter';
 
-type Blog ={
+export type Blog = {
     title: string;
-    file: string;
+    path: string;
     date: string;
-}
+};
 
 export async function getBlogs() {
-    const dir = fs.opendirSync('blogs');
+    const dir = fs.opendirSync('pages/blog');
     const blogs: Blog[] = [];
+
     for await (const dirnet of dir) {
-        const content = fs.readFileSync(`blogs/${dirnet.name}`, 'utf8');
-        const frontmatter = matter(content);
+        const component = require(`../pages/blog/${dirnet.name}`);
+
         blogs.push({
-            title: frontmatter.data.title,
-            file: dirnet.name,
-            date: frontmatter.data.date
+            title: component.title,
+            path: `/blog/${dirnet.name.slice(0, -4)}`,
+            date: component.date
         });
     }
     return blogs;
