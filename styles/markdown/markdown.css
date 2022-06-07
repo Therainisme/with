@@ -434,6 +434,7 @@
 }
 
 .markdown-body pre {
+    tab-size: 18px;
     margin-top: 0;
     margin-bottom: 0;
     font-family: JetBrains Mono, ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;

@@ -1,0 +1,40 @@
+import {BlogLayout, withGetStaticProps} from "@/components/BlogLayout";
+
+export const title = "让我来试试 canvas";
+export const date = "2022-06-07";
+export const getStaticProps = withGetStaticProps(title, date);
+export default (props) => {
+  return BlogLayout(props);
+};
+
+import TwoIntersectingRectangles from "@/components/canvas/TwoIntersectingRectangles";
+import Drawing from "@/components/canvas/Drawing";
+
+
+:::note
+# 写在前面
+大部分是这里的内容 [Canvas API](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial)
+:::
+
+## Basic Usage
+
+### Two Intersecting Rectangles
+
+```ts
+const canvas = canvasRef.current;
+if (canvas?.getContext) {
+	const ctx = canvas.getContext('2d')!;
+
+	ctx.fillStyle = 'rgb(200, 0, 0)';
+	ctx.fillRect(10, 10, 50, 50);
+
+	ctx.fillStyle = 'rgba(0, 0, 200, 0.5)';
+	ctx.fillRect(30, 30, 50, 50);
+}
+```
+
+<TwoIntersectingRectangles/>
+
+### 逝世
+
+<Drawing/>
